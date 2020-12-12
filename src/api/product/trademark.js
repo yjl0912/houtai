@@ -19,7 +19,7 @@ export default{
   },
   //修改品牌
   updateTrademark(data){
-    return requesst({
+    return request({
       url:`${api_name}/update`,
       method:'PUT',
       data
