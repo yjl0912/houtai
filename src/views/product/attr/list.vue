@@ -51,8 +51,8 @@ export default {
     };
   },
   methods:{
-   getAttrList(attrlist){
-     this.attrList = this.attrList
+   getAttrList(attrList){
+     this.attrList = attrList
    }
   },
   components:{
