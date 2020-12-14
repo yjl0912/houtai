@@ -1,16 +1,23 @@
 <template>
   <div>
-    <Category @change="getAttrList" :disabled="!isShowList" />
+    <Category @change="getAttrList" :disabled="!isShowList"
+    @clickList = 'clearList'/>
 
+
+<!-- 第三个分类的详情加载页面 -->
     <el-card v-show="isShowList" style="margin-top: 20px">
-      <el-button type="primary" icon="el-icon-plus">添加属性</el-button>
+      <el-button type="primary" icon="el-icon-plus"
+      :disabled='!category.category3Id'
+      @click='add'>添加属性</el-button>
 
       <el-table :data="attrList" border style="width: 100%; margin: 20px 0">
+   <!-- 序号 -->
         <el-table-column type="index" label="序号" width="80" align="center">
         </el-table-column>
+   <!-- 属性名称 -->
         <el-table-column prop="attrName" label="属性名称" width="150">
         </el-table-column>
-
+   <!-- 属性值列表 row就是attrList数组里面每一个对象 -->
         <el-table-column label="属性值列表">
           <template v-slot="{ row }">
             <el-tag
@@ -21,6 +28,7 @@
             >
           </template>
         </el-table-column>
+  <!-- 操作 -->
         <el-table-column label="操作" width="150">
           <template v-slot="{ row }">
             <el-button
@@ -39,6 +47,16 @@
       </el-table>
     </el-card>
 
+
+
+
+
+
+
+
+
+
+    <!-- 修改和添加部分 -->
     <el-card v-show="!isShowList" style="margin-top: 20px">
       <el-form :model="attr" inline>
         <el-form-item label="属性名" prop="attrName">
@@ -49,6 +67,10 @@
       <el-button type="primary" icon="el-icon-plus" @click="addAttrValue"
         >添加属性值</el-button
       >
+
+
+
+
 
       <el-table
         :data="attr.attrValueList"
@@ -100,9 +122,17 @@
         </el-table-column>
       </el-table>
 
+
+
+
+
+
       <el-button type="primary" @click="save">保存</el-button>
       <el-button @click="isShowList = true">取消</el-button>
     </el-card>
+
+
+
   </div>
 </template>
 
@@ -130,9 +160,26 @@ export default {
         attrName: "",
         attrValueList: [],
       },
+      category: {
+        // 代表三个分类id数据
+        category1Id: "",
+        category2Id: "",
+        category3Id: "",
+      },
     };
   },
   methods: {
+    clearList(){
+      //清空数据
+      this.attrList = [];
+      // 禁用按钮
+      this.category.category3Id = ''
+    },
+    add(){
+      this.isShowList = false;
+      this.attr.attrName = '';
+      this.attr.attrValueList = [];
+    },
     editCompleted(row, index) {
       if (!row.valueName) {
         this.attr.attrValueList.splice(index, 1);
@@ -141,6 +188,16 @@ export default {
       row.edit = false;
     },
     async save() {
+      //判断是否是添加
+      const isAdd = !this.attr.id;
+      const data = this.attr;
+      if(isAdd){
+        //this.attr里面只有attrName和attrValueList
+        //还需要categoryId和categoryLevel
+        data.categoryId = this.category.category3Id;
+        data.categoryLevel = 3;
+      }
+      //修改
       const result = await this.$API.attrs.saveAttrInfo(this.attr);
       if (result.code === 200) {
         this.$message.success("更新属性成功~");

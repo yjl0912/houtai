@@ -57,15 +57,7 @@ export default {
       method: "GET",
     });
   },
-  /*
-  获取属性的属性值列表
-  */
-  getAttrValueList(attrId) {
-    return request({
-      url: `${api_name}/getAttrValueList/${attrId}`,
-      method: "GET",
-    });
-  },
+ 
   /*
   保存属性
   */
