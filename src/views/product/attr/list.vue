@@ -179,6 +179,7 @@ export default {
       this.isShowList = false;
       this.attr.attrName = '';
       this.attr.attrValueList = [];
+      this.attr.id = '';
     },
     editCompleted(row, index) {
       if (!row.valueName) {
