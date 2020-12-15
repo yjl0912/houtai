@@ -136,6 +136,7 @@
 </template>
 
 <script>
+import { category } from "@/api";
 export default {
   name: "SpuUpdateList",
   props: {
@@ -206,10 +207,25 @@ export default {
       }
       callback();
     },
-    save() {
-      this.$refs.spuForm.validate((valid) => {
+     save() {
+      this.$refs.spuForm.validate(async(valid) => {
         if (valid) {
-          console.log("校验通过");
+          // console.log("校验通过");
+          //点击最终的保存按钮是要做的操作
+          const spu = {
+            ...this.spu,//展开数据
+            spuImageList:this.imageList,
+            spuSaleAttrList:this.spuSaleAttrList,
+          };
+          //发送请求
+          const result = await this.$API.spu.updateSpu(spu);
+          if(result.code ===200){
+            //切换回showList
+            this.$emit('showList',this.spu.category3Id);
+            this.$message.success('更新spu成功~')
+          }else{
+            this.$message.error(result.message);
+          }
         }
       });
     },

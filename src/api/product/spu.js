@@ -84,5 +84,14 @@ export default {
       url: `${api_name}/baseSaleAttrList`,
       method: "GET"
     });
+  },
+  // 点击更新组件的保存按钮后更新spu
+  updateSpu(spu){
+   
+    return request({
+      url:`${api_name}/updateSpuInfo`,
+      method:'POST',
+      data:spu
+    })
   }
 };
