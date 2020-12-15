@@ -125,7 +125,7 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="save">保存</el-button>
-        <el-button>取消</el-button>
+        <el-button @click="$emit('showList',spu.category3Id)">取消</el-button>
       </el-form-item>
     </el-form>
 
