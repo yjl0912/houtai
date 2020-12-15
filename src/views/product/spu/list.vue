@@ -5,7 +5,7 @@
       @clearList 当1级分类和2级分类触发的时候触发，清空列表
       :disabled 决定select是否可以使用
      -->
-    <Category />
+    <Category :disabled =" !isShowList"/>
     <!--
       v-show 组件虽然是隐藏的，但是组件被加载了~
      -->
