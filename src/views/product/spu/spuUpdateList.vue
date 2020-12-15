@@ -1,5 +1,5 @@
 <template>
-<!-- 表单校验：
+  <!-- 表单校验：
 1.整体form表单中
 2.通过prop属性来定义表单项名称
 3.定义表单校验规则
@@ -9,7 +9,7 @@
     给form绑定ref
     this.$ref.spuForm.validate  校验表单 -->
   <el-card style="margin-top: 20px">
-    <el-form label-width="80px" :model="spu" :rules='rules' ref="spuForm">
+    <el-form label-width="80px" :model="spu" :rules="rules" ref="spuForm">
       <el-form-item label="SPU名称" prop="spuName">
         <el-input placeholder="请输入SPU名称" v-model="spu.spuName"></el-input>
       </el-form-item>
@@ -81,10 +81,10 @@
           <el-table-column label="属性值列表">
             <template v-slot="{ row }">
               <el-tag
-                @close="delTag(attrVal.id, row)"
+                @close="delTag(i, row)"
                 closable
                 style="margin-right: 5px"
-                v-for="attrVal in row.spuSaleAttrValueList"
+                v-for="(attrVal ,i) in row.spuSaleAttrValueList"
                 :key="attrVal.id"
                 >{{ attrVal.saleAttrValueName }}</el-tag
               >
@@ -92,8 +92,8 @@
                 v-if="row.edit"
                 size="mini"
                 style="width: 100px"
-                @blur="editCompleted(row, $index)"
-                @keyup.enter.native="editCompleted(row, $index)"
+                @blur="editCompleted(row)"
+                @keyup.enter.native="editCompleted(row)"
                 autofocus
                 ref="input"
                 v-model="saleAttrValueText"
@@ -109,7 +109,7 @@
           </el-table-column>
           <el-table-column label="操作" width="150">
             <template v-slot="{ row, $index }">
-            <el-popconfirm
+              <el-popconfirm
                 @onConfirm="delSpuSaleAttr($index)"
                 :title="`确定删除 ${row.saleAttrName} 吗？`"
                 ><el-button
@@ -150,14 +150,14 @@ export default {
       visible: false, // 图片对话框显示&隐藏
       saleAttrList: [], // 所有销售属性列表
       spuSaleAttrList: [], // 当前SPU销售属性列表
-      saleAttrValueText:'',
-      rules:{
-        spuName:[{require:true,message:'请输入SPU名称'}],
-        tmId:[{required:true,message:'请选择品牌~'}],
+      saleAttrValueText: "",
+      rules: {
+        spuName: [{ require: true, message: "请输入SPU名称" }],
+        tmId: [{ required: true, message: "请选择品牌~" }],
         description: [{ required: true, message: "请输入SPU描述~" }],
         imageList: [{ validator: this.imageListValidator, required: true }],
         sale: [{ validator: this.saleValidator, required: true }],
-      }
+      },
     };
   },
   computed: {
@@ -181,57 +181,55 @@ export default {
     },
   },
   methods: {
-     imageListValidator(rule,value,callback){
-        if(this.imageList.length>0){
-          //校验通过
-          callback();
-          return;
-        }
-        //校验失败
-        callback(new Error('请上传至少一张图片~'))
-     },
-     saleValidator(rule,value,callback){
-        //判断至少选择一个销售属性
-        if(this.spuSaleAttrList.length === 0){
-          callback(new Error('请选择至少应该销售属性~'))
-          return;
-        }
-        //判断销售属性中至少添加一个销售属性值
-        const isNotOk = this.spuSaleAttrList.some(
-          (sale) =>sale.spuSaleAttrValueList.length ===0
-        );
-        if(isNotOk){
-          callback(new Error('销售属性至少添加一个销售属性值，请添加~'));
-          return;
-        }
+    imageListValidator(rule, value, callback) {
+      if (this.imageList.length > 0) {
+        //校验通过
         callback();
-     },
-    save(){
-      this.$refs.spuForm.validate((valid)=>{
-         if(valid){
-           console.log('校验通过')
-         }
-      })
+        return;
+      }
+      //校验失败
+      callback(new Error("请上传至少一张图片~"));
+    },
+    saleValidator(rule, value, callback) {
+      //判断至少选择一个销售属性
+      if (this.spuSaleAttrList.length === 0) {
+        callback(new Error("请选择至少应该销售属性~"));
+        return;
+      }
+      //判断销售属性中至少添加一个销售属性值
+      const isNotOk = this.spuSaleAttrList.some(
+        (sale) => sale.spuSaleAttrValueList.length === 0
+      );
+      if (isNotOk) {
+        callback(new Error("销售属性至少添加一个销售属性值，请添加~"));
+        return;
+      }
+      callback();
+    },
+    save() {
+      this.$refs.spuForm.validate((valid) => {
+        if (valid) {
+          console.log("校验通过");
+        }
+      });
     },
     //删除整个销售属性
-    delSpuSaleAttr(index){
+    delSpuSaleAttr(index) {
       console.log(index);
-      this.spuSaleAttrList.splice(index,1)
+      this.spuSaleAttrList.splice(index, 1);
     },
 
     //删除单个销售属性值
-    delTag(tagId,row){
-      row.spuSaleAttrValueList = row.spuSaleAttrValueList.filter(
-        (saleAttrValue)=>saleAttrValue.id !==tagId
-      )
+    delTag(index, row) {
+      row.spuSaleAttrValueList.splice(index, 1);
     },
-     edit(row) {
+    edit(row) {
       this.$set(row, "edit", true);
       this.$nextTick(() => {
         this.$refs.input.focus();
       });
     },
-      // 添加销售属性值
+    // 添加销售属性值
     editCompleted(row, index) {
       if (this.saleAttrValueText) {
         row.spuSaleAttrValueList.push({
@@ -246,7 +244,7 @@ export default {
 
       row.edit = false;
     },
-       addSpuSaleAttr() {
+    addSpuSaleAttr() {
       // 选中的销售属性
       const { sale, id } = this.spu;
 
