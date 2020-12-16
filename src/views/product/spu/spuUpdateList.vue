@@ -30,7 +30,7 @@
           v-model="spu.description"
         ></el-input>
       </el-form-item>
-      <el-form-item label="SPU图片">
+      <el-form-item label="SPU图片" prop="imageList">
         <el-upload
           accept="image/*"
           class="avatar-uploader"
@@ -84,7 +84,7 @@
                 @close="delTag(i, row)"
                 closable
                 style="margin-right: 5px"
-                v-for="(attrVal ,i) in row.spuSaleAttrValueList"
+                v-for="(attrVal, i) in row.spuSaleAttrValueList"
                 :key="attrVal.id"
                 >{{ attrVal.saleAttrValueName }}</el-tag
               >
@@ -125,7 +125,7 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="save">保存</el-button>
-        <el-button @click="$emit('showList',spu.category3Id)">取消</el-button>
+        <el-button @click="$emit('showList', spu.category3Id)">取消</el-button>
       </el-form-item>
     </el-form>
 
@@ -207,23 +207,30 @@ export default {
       }
       callback();
     },
-     save() {
-      this.$refs.spuForm.validate(async(valid) => {
+    save() {
+      this.$refs.spuForm.validate(async (valid) => {
         if (valid) {
           // console.log("校验通过");
           //点击最终的保存按钮是要做的操作
           const spu = {
-            ...this.spu,//展开数据
-            spuImageList:this.imageList,
-            spuSaleAttrList:this.spuSaleAttrList,
+            ...this.spu, //展开数据
+            spuImageList: this.imageList,
+            spuSaleAttrList: this.spuSaleAttrList,
           };
+          let result;
           //发送请求
-          const result = await this.$API.spu.updateSpu(spu);
-          if(result.code ===200){
+          // 判断是添加spu还是修改spu，修改有spu.id，而添加没有spu.id
+          if (this.spu.id) {
+            result = await this.$API.spu.updateSpu(spu);
+          } else {
+            result = await this.$API.spu.saveSpu(spu);
+          }
+
+          if (result.code === 200) {
             //切换回showList
-            this.$emit('showList',this.spu.category3Id);
-            this.$message.success('更新spu成功~')
-          }else{
+            this.$emit("showList", this.spu.category3Id);
+            this.$message.success(`${this.spu.id ? "更新" : "添加"}SPU成功~`);
+          } else {
             this.$message.error(result.message);
           }
         }
@@ -363,9 +370,12 @@ export default {
   },
   async mounted() {
     this.getTrademarkList();
-    this.getSpuImageList();
     this.getSaleAttrList();
-    this.getSpuSaleAttrList();
+
+    if (this.spu.id) {
+      this.getSpuImageList();
+      this.getSpuSaleAttrList();
+    }
   },
 };
 </script>
